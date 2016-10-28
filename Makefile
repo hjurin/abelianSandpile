@@ -15,16 +15,16 @@ SANDPILES := $(patsubst %,$(ODIR)/%,$(_SANDPILES))
 default: $(EXEC)
 
 $(ODIR)/%.o: $(SDIR)/%.cpp $(SDIR)/%.hpp $(SDIR)/ArraySandpile.hpp
-	$(CC) $(CPPFLAGS) -c $<
+	$(CC) $(CPPFLAGS) -c $< -o $@
 
 $(ODIR)/ArraySandpile.o: $(SDIR)/ArraySandpile.cpp $(SDIR)/Sandpile.hpp
-	$(CC) $(CPPFLAGS) -c $<
+	$(CC) $(CPPFLAGS) -c $< -o $@
 
 $(ODIR)/Execution.o: $(SDIR)/Execution.cpp
-	$(CC) $(CPPFLAGS) -c $<
+	$(CC) $(CPPFLAGS) -c $< -o $@
 
 $(ODIR)/launcher.o: $(SDIR)/launcher.cpp
-	$(CC) $(CPPFLAGS) -c $<
+	$(CC) $(CPPFLAGS) -c $< -o $@
 
 sand: $(ODIR)/launcher.o $(SANDPILES) $(ODIR)/ArraySandpile.o $(ODIR)/Execution.o
 	$(CC) $(CPPFLAGS) $^ -o $(BDIR)/$@
