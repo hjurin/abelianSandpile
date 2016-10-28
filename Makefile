@@ -1,4 +1,5 @@
-CC := g++
+CC := gcc
+CCPP := g++
 EXEC := sand ompOnly
 CFLAGS	:= -Wall -g -O2 -std=c99 -fopenmp
 CPPFLAGS := -Wall -g -O2 -std=c++98 -fopenmp
@@ -15,19 +16,19 @@ SANDPILES := $(patsubst %,$(ODIR)%,$(_SANDPILES))
 default: $(EXEC)
 
 $(ODIR)%.o: $(SDIR)%.cpp $(SDIR)%.hpp $(SDIR)ArraySandpile.hpp
-	$(CC) $(CPPFLAGS) -c $< -o $@
+	$(CCPP) $(CPPFLAGS) -c $< -o $@
 
 $(ODIR)ArraySandpile.o: $(SDIR)ArraySandpile.cpp $(SDIR)Sandpile.hpp
-	$(CC) $(CPPFLAGS) -c $< -o $@
+	$(CCPP) $(CPPFLAGS) -c $< -o $@
 
 $(ODIR)Execution.o: $(SDIR)Execution.cpp
-	$(CC) $(CPPFLAGS) -c $< -o $@
+	$(CCPP) $(CPPFLAGS) -c $< -o $@
 
 $(ODIR)launcher.o: $(SDIR)launcher.cpp
-	$(CC) $(CPPFLAGS) -c $< -o $@
+	$(CCPP) $(CPPFLAGS) -c $< -o $@
 
 sand: $(ODIR)launcher.o $(SANDPILES) $(ODIR)ArraySandpile.o $(ODIR)Execution.o
-	$(CC) $(CPPFLAGS) $^ -o $(BDIR)$@
+	$(CCPP) $(CPPFLAGS) $^ -o $(BDIR)$@
 
 ompOnly: $(SDIR)ompOnly.c
 	$(CC) $^ -o $(BDIR)$@ $(CFLAGS)
