@@ -1,7 +1,7 @@
 CC := gcc
 CCPP := g++
 EXEC := sand ompOnly
-CFLAGS	:= -Wall -g -O2 -std=c99 -fopenmp
+CFLAGS := -Wall -g -O2 -std=c99 -fopenmp
 CPPFLAGS := -Wall -g -O2 -std=c++98 -fopenmp
 
 ODIR := obj/

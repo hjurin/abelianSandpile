@@ -68,10 +68,41 @@ void print (unsigned * array, unsigned s)
 	}
 }
 
+typedef struct Neighbours {
+  unsigned nb;
+  unsigned index[4];
+} Neighbours;
 
-int nextStep(unsigned ** arrays, unsigned start, unsigned end, unsigned step, unsigned size)
+Neighbours * initGivers (unsigned s)
+{
+	Neighbours * givers = malloc(s*s * sizeof(Neighbours));
+  int i;
+  for (int y = 0; y < s; y++) {
+    for (int x = 0; x < s; x++) 
+    {
+      i = s*y + x;
+      givers[i].nb = 0;
+      if (0 < x && x < s-1 && y >= 2) {
+        givers[i].index[givers[i].nb++] = i - s;
+      }
+      if (0 < x && x < s-1 && y <= s-3) {
+        givers[i].index[givers[i].nb++] = i + s;
+      }
+      if (0 < y && y < s-1 && x >= 2) {
+        givers[i].index[givers[i].nb++] = i - 1;
+      }
+      if (0 < y && y < s-1 && x <= s-3) {
+        givers[i].index[givers[i].nb++] = i + 1;
+      }
+    }
+  }
+  return givers;
+}
+
+int nextStep(unsigned ** arrays, unsigned start, unsigned end, unsigned step, unsigned size, Neighbours * givers)
 {
 	int val, i, x, y;
+	Neighbours n;
 	int keepOn = 0;
   for (i = start; i < end; i++) 
   {
@@ -160,10 +191,11 @@ int main(int argc, char **argv) {
   }
 
 
-	unsigned * current = (unsigned*)malloc(size*size*sizeof(unsigned));
+	unsigned * current = malloc(size*size*sizeof(unsigned));
   initFuncs[initConfig](current, size);
-	unsigned * next = (unsigned*)malloc(size*size*sizeof(unsigned));
+	unsigned * next = malloc(size*size*sizeof(unsigned));
 	unsigned * arrays[2] = {current, next};
+	Neighbours * givers = initGivers(size);
 
 	int nbThreads = omp_get_max_threads();
   float perThread = (float)(size*size)/nbThreads;
@@ -183,7 +215,7 @@ int main(int argc, char **argv) {
 		int tId = omp_get_thread_num();
 		int step = 0;
 		while(keepOn) {
-			keepOns[tId] = nextStep(arrays, start[tId], end[tId], step, size);
+			keepOns[tId] = nextStep(arrays, start[tId], end[tId], step, size, givers);
 	  	step++;
 			#pragma omp barrier
 			// print if needed
@@ -215,4 +247,5 @@ int main(int argc, char **argv) {
 
 	free(current);
 	free(next);
+	free(givers);
 }
