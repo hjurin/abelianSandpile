@@ -48,10 +48,10 @@ initFunc initFuncs[2] = { homoInit, peakInit };
 
 void print (unsigned * array, unsigned s)
 {
+    int max = 0;
     int val;
     for (int y = 0; y < s; y++) {
         for (int x = 0; x < s; x++) {
-            int max = 0;
             val = array[s*y + x];
             max = (val > max) ? val : max;
         }
