@@ -1,7 +1,7 @@
 CC := g++
 EXEC := sand ompOnly
-CFLAGS	:=	-Wall -g -O2 -std=c++11 -fopenmp
-LDFLAGS := -Wall -g -O2 -std=c++11 -fopenmp
+CFLAGS	:= -Wall -g -O2 -std=c99 -fopenmp
+CPPFLAGS := -Wall -g -O2 -std=c++98 -fopenmp
 SANDPILES := ArraySandpileSeq1.o ArraySandpileSeq2.o ArraySandpileOMP1.o ArraySandpileOMP2.o ArraySandpileOMP3.o
 
 BIN_REP := ../bin/
@@ -11,31 +11,31 @@ BIN_REP := ../bin/
 default: $(EXEC)
 
 ArraySandpile.o: ArraySandpile.cpp Sandpile.hpp
-	$(CC) $(CFLAGS) -c $<
+	$(CC) $(CPPFLAGS) -c $<
 
 ArraySandpileSeq1.o: ArraySandpileSeq1.cpp ArraySandpileSeq1.hpp ArraySandpile.hpp
-	$(CC) $(CFLAGS) -c $<
+	$(CC) $(CPPFLAGS) -c $<
 
 ArraySandpileSeq2.o: ArraySandpileSeq2.cpp ArraySandpileSeq2.hpp ArraySandpile.hpp
-	$(CC) $(CFLAGS) -c $<
+	$(CC) $(CPPFLAGS) -c $<
 
 ArraySandpileOMP1.o: ArraySandpileOMP1.cpp ArraySandpileOMP1.hpp ArraySandpile.hpp
-	$(CC) $(CFLAGS) -c $<
+	$(CC) $(CPPFLAGS) -c $<
 
 ArraySandpileOMP2.o: ArraySandpileOMP2.cpp ArraySandpileOMP2.hpp ArraySandpile.hpp
-	$(CC) $(CFLAGS) -c $<
+	$(CC) $(CPPFLAGS) -c $<
 
 ArraySandpileOMP3.o: ArraySandpileOMP3.cpp ArraySandpileOMP3.hpp ArraySandpile.hpp
-	$(CC) $(CFLAGS) -c $<
+	$(CC) $(CPPFLAGS) -c $<
 
 Execution.o: Execution.cpp
-	$(CC) $(CFLAGS) -c $<
+	$(CC) $(CPPFLAGS) -c $<
 
 launcher.o: launcher.cpp
-	$(CC) $(CFLAGS) -c $<
+	$(CC) $(CPPFLAGS) -c $<
 
 sand: launcher.o $(SANDPILES) ArraySandpile.o Execution.o
-	$(CC) $(LDFLAGS) $^ -o $(BIN_REP)$@
+	$(CC) $(CPPFLAGS) $^ -o $(BIN_REP)$@
 
 ompOnly: ompOnly.c
 	$(CC) $^ -o $(BIN_REP)$@ $(CFLAGS)
