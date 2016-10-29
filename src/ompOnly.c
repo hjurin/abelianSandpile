@@ -48,7 +48,7 @@ initFunc initFuncs[2] = { homoInit, peakInit };
 
 void print (unsigned * array, unsigned s)
 {
-    int max = 1;
+    int max = 0;
     int val;
     for (int y = 0; y < s; y++) {
         for (int x = 0; x < s; x++) {
