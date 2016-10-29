@@ -6,8 +6,8 @@
 #include <algorithm>
 #include "omp.h"
 
-ArraySandpileOMP3::ArraySandpileOMP3(int size, int globalHeight, int peakHeight, int nbThreads) : 
-    ArraySandpile(size, globalHeight, peakHeight), 
+ArraySandpileOMP3::ArraySandpileOMP3(int size, int globalHeight, int peakHeight, int nbThreads) :
+    ArraySandpile(size, globalHeight, peakHeight),
     stable(false), givers(new Neighbours[size*size]), nbThreads(nbThreads),
     start(new int[nbThreads]), end(new int[nbThreads]), subStable(new bool[nbThreads])
 {
@@ -29,12 +29,11 @@ ArraySandpileOMP3::ArraySandpileOMP3(int size, int globalHeight, int peakHeight,
         givers[i].index[givers[i].nb++] = i + 1;
         }
     }
-  
+
     int perThread = ceil((float)(size)/nbThreads);
     for (i = 0; i < nbThreads; i++) {
         start[i] = size * i*perThread;
         end[i] = size * std::min((i+1)*perThread, size);
-        // printf("%d: %d-%d\n", i, start[i], end[i]);
         subStable[i] = false;
     }
 }
@@ -55,7 +54,7 @@ void ArraySandpileOMP3::compute(int nbSteps)
     int *g1 = grid1;
     int *g2 = grid2;
     int *tmp;
-    while (0 < nbSteps) 
+    while (0 < nbSteps)
     {
         subStable[tId] = true;
         for (i = start[tId]; i < end[tId]; i++) {
