@@ -1,5 +1,12 @@
+OS := $(shell uname)
+ifeq ($(OS),Darwin)
+CC := clang-omp
+CCPP := clang++-omp
+else
 CC := gcc
 CCPP := g++
+endif
+
 EXEC := sand ompOnly
 CFLAGS := -Wall -g -O2 -std=c99 -lm -fopenmp
 CPPFLAGS := -Wall -g -O2 -std=c++98 -fopenmp
