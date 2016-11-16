@@ -2,15 +2,15 @@
 
 #include <cmath>
 
-ArraySandpile::ArraySandpile(int size, int globalHeight, int peakHeight) : 
-    s(size), 
+ArraySandpile::ArraySandpile(int size, int globalHeight, int peakHeight) :
+    s(size),
     grid1(new int[size*size]),
     grid2(new int[size*size])
 {
     for (int i = 0; i < s*s; i++) {
         grid1[i] = globalHeight;
     }
-    grid1[s*s/2 + s/2] = peakHeight; // Central cell
+    grid1[s*s/2 + (1 - s%2)*s/2] = peakHeight; // Central cell
 }
 
 ArraySandpile::~ArraySandpile()
@@ -29,7 +29,7 @@ int ArraySandpile::height(int x, int y)
     return grid1[s*y + x];
 }
 
-void ArraySandpile::print(FILE *stream) 
+void ArraySandpile::print(FILE *stream)
 {
     /* To make the display more readable, the height of each cell is printed
      * with the same width, which must thus be computed before hand.*/

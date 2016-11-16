@@ -21,11 +21,11 @@ int main (int argc, char **argv)
 {
   int size = -1;
   int config = -1;
-  int dispMode = -1; 
+  int dispMode = -1;
   int version = -1;
   int batchSize = -1;
-  
-  std::string usage = ("Usage: " + std::string(argv[0]) + " -b value -c value -d value -s value -v value\n" + 
+
+  std::string usage = ("Usage: " + std::string(argv[0]) + " -b value -c value -d value -s value -v value\n" +
     "-b (batchSize): the states of the sandpile are computed batchSize by batchSize.\n" +
     "-c (configuration): 0 for an homogenous configuration, 1 for a peak configuration.\n" +
     "-d (display mode): 0 for duration only, 1 for final state and duration, 2 for all states and duration.\n" +
@@ -57,8 +57,8 @@ int main (int argc, char **argv)
     }
   }
 
-  if (batchSize < 1 || config < 0 || config > 1 || dispMode < 0 || 
-    dispMode > 2 || size < 1 || version < 1 || version > 5) 
+  if (batchSize < 1 || config < 0 || config > 1 || dispMode < 0 ||
+    dispMode > 2 || size < 1 || version < 1 || version > 5)
   {
     std::cerr << usage;
     return 1;
@@ -67,32 +67,32 @@ int main (int argc, char **argv)
   Sandpile* pile;
   switch (version) {
     case 1:
-      pile = new ArraySandpileSeq1(size, 
-                                (1-config)*GLOBAL_HEIGHT, 
-                                config*PEAK_HEIGHT + (1-config)*GLOBAL_HEIGHT);
+      pile = new ArraySandpileSeq1(size,
+                                  (1-config)*GLOBAL_HEIGHT,
+                                  config*PEAK_HEIGHT + (1-config)*GLOBAL_HEIGHT);
       break;
     case 2:
-      pile = new ArraySandpileSeq2(size, 
-                                (1-config)*GLOBAL_HEIGHT, 
-                                config*PEAK_HEIGHT + (1-config)*GLOBAL_HEIGHT);
+      pile = new ArraySandpileSeq2(size,
+                                  (1-config)*GLOBAL_HEIGHT, 
+                                  config*PEAK_HEIGHT + (1-config)*GLOBAL_HEIGHT);
       break;
     case 3:
-      pile = new ArraySandpileOMP1(size, 
-                                (1-config)*GLOBAL_HEIGHT, 
-                                config*PEAK_HEIGHT + (1-config)*GLOBAL_HEIGHT,
-                                omp_get_max_threads());
+      pile = new ArraySandpileOMP1(size,
+                                  (1-config)*GLOBAL_HEIGHT, 
+                                  config*PEAK_HEIGHT + (1-config)*GLOBAL_HEIGHT,
+                                  omp_get_max_threads());
       break;
     case 4:
-      pile = new ArraySandpileOMP2(size, 
-                                (1-config)*GLOBAL_HEIGHT, 
-                                config*PEAK_HEIGHT + (1-config)*GLOBAL_HEIGHT,
-                                omp_get_max_threads());
+      pile = new ArraySandpileOMP2(size,
+                                  (1-config)*GLOBAL_HEIGHT, 
+                                  config*PEAK_HEIGHT + (1-config)*GLOBAL_HEIGHT,
+                                  omp_get_max_threads());
       break;
     case 5:
-      pile = new ArraySandpileOMP3(size, 
-                                (1-config)*GLOBAL_HEIGHT, 
-                                config*PEAK_HEIGHT + (1-config)*GLOBAL_HEIGHT,
-                                omp_get_max_threads());
+      pile = new ArraySandpileOMP3(size,
+                                  (1-config)*GLOBAL_HEIGHT, 
+                                  config*PEAK_HEIGHT + (1-config)*GLOBAL_HEIGHT,
+                                  omp_get_max_threads());
       break;
     default:
       return 1;
