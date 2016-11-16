@@ -13,7 +13,11 @@ SANDPILES := $(patsubst %,$(ODIR)%,$(_SANDPILES))
 
 .phony: default clean
 
-default: $(EXEC)
+default: mkdir $(EXEC)
+
+mkdir:
+	@if [ ! -d $(ODIR) ]; then mkdir $(ODIR); fi
+	@if [ ! -d $(BDIR) ]; then mkdir $(BDIR); fi
 
 $(ODIR)%.o: $(SDIR)%.cpp $(SDIR)%.hpp $(SDIR)ArraySandpile.hpp
 	$(CCPP) $(CPPFLAGS) -c $< -o $@
@@ -34,4 +38,4 @@ ompOnly: $(SDIR)ompOnly.c
 	$(CC) $^ -o $(BDIR)$@ $(CFLAGS)
 
 clean:
-	rm -rf $(BDIR)* $(ODIR)*
+	rm -rf $(BDIR) $(ODIR)
