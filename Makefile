@@ -10,6 +10,7 @@ endif
 EXEC := sand ompOnly
 CFLAGS := -Wall -g -O2 -std=c99 -lm -fopenmp
 CPPFLAGS := -Wall -g -O2 -std=c++98 -fopenmp
+LIBS := -lSDL2
 
 ODIR := obj/
 SDIR := src/
@@ -39,10 +40,10 @@ $(ODIR)launcher.o: $(SDIR)launcher.cpp
 	$(CCPP) $(CPPFLAGS) -c $< -o $@
 
 sand: $(ODIR)launcher.o $(SANDPILES) $(ODIR)ArraySandpile.o $(ODIR)Execution.o
-	$(CCPP) $(CPPFLAGS) $^ -o $(BDIR)$@
+	$(CCPP) $(CPPFLAGS) $(LIBS) $^ -o $(BDIR)$@
 
 ompOnly: $(SDIR)ompOnly.c
-	$(CC) $^ -o $(BDIR)$@ $(CFLAGS)
+	$(CC) $^ -o $(BDIR)$@ $(LIBS) $(CFLAGS)
 
 clean:
 	rm -rf $(BDIR) $(ODIR)

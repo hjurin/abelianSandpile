@@ -3,6 +3,7 @@
 
 #include "Sandpile.hpp"
 #include <time.h>
+#include "omp.h"
 
 class Execution {
     public:

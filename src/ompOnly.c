@@ -7,6 +7,7 @@
 #include <ctype.h>
 #include <time.h>
 #include <sys/time.h>
+#include <SDL2/SDL.h>
 #include "omp.h"
 
 
@@ -23,6 +24,9 @@
 
 #define DISPLAY_FREQUENCY 20
 
+SDL_Event event;
+SDL_Renderer *renderer;
+SDL_Window *window;
 
 /* Initializes the specified sandpile to initial configuration 0
    (homogeneous height HOMO_INIT_HEIGHT). */
@@ -45,6 +49,49 @@ void peakInit(unsigned * sandpile, unsigned size)
 
 typedef void (*initFunc)(unsigned *, unsigned);
 initFunc initFuncs[2] = { homoInit, peakInit };
+
+void initSDL(unsigned s)
+{
+    if (s > 400) {
+        SDL_CreateWindowAndRenderer(s-2, s-2, 0, &window, &renderer);
+    } else {
+        int ratio = 900 / s;
+        SDL_CreateWindowAndRenderer((s - 2) * ratio, (s - 2) * ratio, 0, &window, &renderer);
+    }
+    SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0);
+    SDL_RenderClear(renderer);
+}
+
+void printSDL(unsigned * array, unsigned s)
+{
+    for (int i = 0; i < s*s; i++) {
+        if (array[i] > 7) {
+            SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
+        }
+        else {
+            SDL_SetRenderDrawColor(renderer, array[i]*20, 0, 0, 255);
+
+        }
+        if (s > 400) {
+            SDL_RenderDrawPoint(renderer, i%s-1, i/s-1);
+        } else {
+            SDL_Rect rect;
+            rect.w = 900 / s;
+            rect.h = rect.w;
+            rect.x = (i%s - 1) * rect.w;
+            rect.y = (i/s - 1) * rect.w;
+            SDL_RenderFillRect(renderer, &rect);
+        }
+    }
+    SDL_RenderPresent(renderer);
+}
+
+void exitSDL()
+{
+    SDL_DestroyRenderer(renderer);
+    SDL_DestroyWindow(window);
+    SDL_Quit();
+}
 
 void print (unsigned * array, unsigned s)
 {
@@ -110,14 +157,16 @@ int main(int argc, char **argv) {
             /* display mode
             0 : none
             1 : final state
-            2 : all states */
+            2 : all states
+            3 : SDL */
             case 'd':
             displayMode = atoi(optarg);
-            if (displayMode < 0 || displayMode > 2) {
+            if (displayMode < 0 || displayMode > 3) {
                 fprintf(stderr, "Wrong argument for option -d (display mode). Please use :\n");
                 fprintf(stderr, "0 for no display, \n");
                 fprintf(stderr, "1 for final state only, \n");
                 fprintf(stderr, "2 for all states. \n");
+                fprintf(stderr, "3 for SDL. \n");
                 abort();
             }
             break;
@@ -175,6 +224,9 @@ int main(int argc, char **argv) {
     int keepOn = 1;
     int keepOns[nbThreads];
 
+    if (displayMode == 3) {
+        initSDL(size);
+    }
 
     #pragma omp parallel
     {
@@ -189,8 +241,33 @@ int main(int argc, char **argv) {
                 #pragma omp single
                 print(arrays[step%2], size);
             }
+            if (displayMode == 3) {
+                // master thread manage SDL_Event
+                if (tId == 0)
+                {
+                    SDL_Event event;
+                    while (SDL_PollEvent(&event)) {
+                        if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_q) {
+                            exitSDL();
+                            exit(0);
+                        } else if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_p) {
+                            SDL_Delay(1000);
+                            while (1) {
+                                SDL_WaitEvent(&event);
+                                if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_p) {
+                                    break;
+                                }
+                            }
+                        } else if (event.type == SDL_WINDOWEVENT && event.window.event == SDL_WINDOWEVENT_CLOSE) {
+                            exitSDL();
+                            exit(0);
+                        }
+                    }
+                    printSDL(arrays[step%2], size);
+                }
+            }
             // Checks for stability every once in a while
-            if (step % 10 == 0) {
+            if (step % 100 == 0) {
                 #pragma omp single
                 {
                     keepOn = 0;
@@ -204,10 +281,24 @@ int main(int argc, char **argv) {
         #pragma omp single
         {
             gettimeofday(&t2,NULL);
-            if (displayMode > 0) {
+            if (displayMode > 0 && displayMode < 3) {
                 print(arrays[step%2], size);
             }
             printf("\n%g\n", TIME_DIFF(t1,t2) / 1000);
+        }
+    }
+
+    if (displayMode == 3) {
+        SDL_Event event;
+        while (1) {
+            SDL_WaitEvent(&event);
+            if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_q) {
+                exitSDL();
+                break;
+            } else if (event.type == SDL_WINDOWEVENT && event.window.event == SDL_WINDOWEVENT_CLOSE) {
+                exitSDL();
+                break;
+            }
         }
     }
 

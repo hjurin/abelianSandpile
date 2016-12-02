@@ -46,6 +46,49 @@ void ArraySandpile::print(FILE *stream)
     }
 }
 
+void ArraySandpile::initSDL()
+{
+    if (s > 400) {
+        SDL_CreateWindowAndRenderer(s-2, s-2, 0, &window, &renderer);
+    } else {
+        int ratio = 900 / s;
+        SDL_CreateWindowAndRenderer((s - 2) * ratio, (s - 2) * ratio, 0, &window, &renderer);
+    }
+    SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0);
+    SDL_RenderClear(renderer);
+}
+
+void ArraySandpile::printSDL()
+{
+    for (int i = 0; i < s*s; i++) {
+        if (grid1[i] > 7) {
+            SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
+        }
+        else {
+            SDL_SetRenderDrawColor(renderer, grid1[i]*20, 0, 0, 255);
+
+        }
+        if (s > 400) {
+            SDL_RenderDrawPoint(renderer, i%s-1, i/s-1);
+        } else {
+            SDL_Rect rect;
+            rect.w = 900 / s;
+            rect.h = rect.w;
+            rect.x = (i%s - 1) * rect.w;
+            rect.y = (i/s - 1) * rect.w;
+            SDL_RenderFillRect(renderer, &rect);
+        }
+    }
+    SDL_RenderPresent(renderer);
+}
+
+void ArraySandpile::exitSDL()
+{
+    SDL_DestroyRenderer(renderer);
+    SDL_DestroyWindow(window);
+    SDL_Quit();
+}
+
 void ArraySandpile::nextStep() {
     int * tmp = grid1;
     grid1 = grid2;

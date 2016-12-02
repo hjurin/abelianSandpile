@@ -4,6 +4,7 @@
 #include <string>
 #include <stdlib.h>
 #include <getopt.h>
+#include <SDL2/SDL.h>
 #include "omp.h"
 
 #include "Execution.hpp"
@@ -28,9 +29,10 @@ int main (int argc, char **argv)
   std::string usage = ("Usage: " + std::string(argv[0]) + " -b value -c value -d value -s value -v value\n" +
     "-b (batchSize): the states of the sandpile are computed batchSize by batchSize.\n" +
     "-c (configuration): 0 for an homogenous configuration, 1 for a peak configuration.\n" +
-    "-d (display mode): 0 for duration only, 1 for final state and duration, 2 for all states and duration.\n" +
+    "-d (display mode): 0 for duration only, 1 for final state and duration, 2 for all states and duration, 3 for SDL.\n" +
     "-s (size): the sandpile's size is s x s.\n" +
-    "-v (version): 1 for seq1, 2 for seq2, 3 for omp1, 4 for omp2, 5 for gpu.\n\n");
+    "-v (version): 1 for seq1, 2 for seq2, 3 for omp1, 4 for omp2, 5 for gpu.\n" +
+    "/!\\ if SDL display mode is used, size must be smaller than screen height (in pixels)\n");
 
   int opt;
   while ((opt = getopt(argc, argv, "b:c:d:s:v:")) != -1) {
@@ -58,10 +60,20 @@ int main (int argc, char **argv)
   }
 
   if (batchSize < 1 || config < 0 || config > 1 || dispMode < 0 ||
-    dispMode > 2 || size < 1 || version < 1 || version > 5)
+    dispMode > 3 || size < 1 || version < 1 || version > 5)
   {
     std::cerr << usage;
     return 1;
+  }
+
+  if (dispMode == 3) {
+      SDL_Init(SDL_INIT_VIDEO);
+      SDL_DisplayMode dm;
+      SDL_GetDesktopDisplayMode(0, &dm);
+      if (size > dm.h) {
+          std::cerr << usage;
+          return 1;
+      }
   }
 
   Sandpile* pile;
@@ -73,24 +85,24 @@ int main (int argc, char **argv)
       break;
     case 2:
       pile = new ArraySandpileSeq2(size,
-                                  (1-config)*GLOBAL_HEIGHT, 
+                                  (1-config)*GLOBAL_HEIGHT,
                                   config*PEAK_HEIGHT + (1-config)*GLOBAL_HEIGHT);
       break;
     case 3:
       pile = new ArraySandpileOMP1(size,
-                                  (1-config)*GLOBAL_HEIGHT, 
+                                  (1-config)*GLOBAL_HEIGHT,
                                   config*PEAK_HEIGHT + (1-config)*GLOBAL_HEIGHT,
                                   omp_get_max_threads());
       break;
     case 4:
       pile = new ArraySandpileOMP2(size,
-                                  (1-config)*GLOBAL_HEIGHT, 
+                                  (1-config)*GLOBAL_HEIGHT,
                                   config*PEAK_HEIGHT + (1-config)*GLOBAL_HEIGHT,
                                   omp_get_max_threads());
       break;
     case 5:
       pile = new ArraySandpileOMP3(size,
-                                  (1-config)*GLOBAL_HEIGHT, 
+                                  (1-config)*GLOBAL_HEIGHT,
                                   config*PEAK_HEIGHT + (1-config)*GLOBAL_HEIGHT,
                                   omp_get_max_threads());
       break;
